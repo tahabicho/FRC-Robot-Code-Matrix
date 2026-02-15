@@ -75,8 +75,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // CHANGEMENT ICI: LY pour avant/arrière, RX pour rotation
-    double speed = -m_stick.getRawAxis(1);      // Axe 1 = Stick Gauche Y (LY)
-    double rotation = -m_stick.getRawAxis(4);   // Axe 4 = Stick Droit X (RX)
+    double speed = m_stick.getRawAxis(1);      // Axe 1 = Stick Gauche Y (LY)
+    double rotation = m_stick.getRawAxis(4);   // Axe 4 = Stick Droit X (RX)
     
     // Modes de vitesse
     if (m_stick.getRawButton(1)) {
