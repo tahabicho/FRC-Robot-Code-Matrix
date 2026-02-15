@@ -19,17 +19,16 @@ public class Robot extends TimedRobot {
   private SparkMax m_rightMotor;
   
   // ===============================================
-  // CONFIGURATION DU TYPE DE MOTEUR ICI
+  // CONFIGURATION - Changez selon vos moteurs physiques
   // ===============================================
-  private static final MotorType MOTOR_TYPE = MotorType.kBrushless;  // Changez ici!
-  // Options: MotorType.kBrushless ou MotorType.kBrushed
+  private static final MotorType MOTOR_TYPE = MotorType.kBrushed;
   
   // Paramètres selon le type de moteur
   private static final int CURRENT_LIMIT = (MOTOR_TYPE == MotorType.kBrushless) ? 40 : 35;
   
-  private static final double NORMAL_SPEED = 0.8;
-  private static final double SLOW_SPEED = 0.4;
-  private static final double TURBO_SPEED = 1.0;
+  private static final double NORMAL_SPEED = 0.2;
+  private static final double SLOW_SPEED = 0.2;
+  private static final double TURBO_SPEED = 0.2;
   private static final double ROTATION_SPEED = 0.7;
   private static final double DEADBAND = 0.08;
 
@@ -47,7 +46,7 @@ public class Robot extends TimedRobot {
     config.voltageCompensation(12.0);
     config.openLoopRampRate(0.3);
     
-    m_leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_leftMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     
     // Configuration moteur droit (inversé)
     SparkMaxConfig configRight = new SparkMaxConfig();
@@ -57,7 +56,7 @@ public class Robot extends TimedRobot {
     configRight.voltageCompensation(12.0);
     configRight.openLoopRampRate(0.3);
     
-    m_rightMotor.configure(configRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_rightMotor.configure(configRight, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     // Configuration du DifferentialDrive
     m_myRobot = new DifferentialDrive(m_leftMotor, m_rightMotor);
@@ -70,12 +69,14 @@ public class Robot extends TimedRobot {
     String motorTypeName = (MOTOR_TYPE == MotorType.kBrushless) ? "Brushless" : "Brushed";
     SmartDashboard.putString("Motor Type", motorTypeName);
     SmartDashboard.putNumber("Current Limit", CURRENT_LIMIT);
+    SmartDashboard.putString("Control Mode", "Split Arcade (LY + RX)");
   }
 
   @Override
   public void teleopPeriodic() {
-    double speed = -m_stick.getY();
-    double rotation = -m_stick.getX();
+    // CHANGEMENT ICI: LY pour avant/arrière, RX pour rotation
+    double speed = -m_stick.getRawAxis(1);      // Axe 1 = Stick Gauche Y (LY)
+    double rotation = -m_stick.getRawAxis(4);   // Axe 4 = Stick Droit X (RX)
     
     // Modes de vitesse
     if (m_stick.getRawButton(1)) {
@@ -92,6 +93,8 @@ public class Robot extends TimedRobot {
     m_myRobot.arcadeDrive(speed, rotation);
     
     // Télémétrie
+    SmartDashboard.putNumber("LY (Speed)", speed);
+    SmartDashboard.putNumber("RX (Rotation)", rotation);
     SmartDashboard.putNumber("Left Motor Current", m_leftMotor.getOutputCurrent());
     SmartDashboard.putNumber("Right Motor Current", m_rightMotor.getOutputCurrent());
   }
