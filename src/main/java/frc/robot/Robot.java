@@ -3,31 +3,101 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkBase.PersistMode;
 
 public class Robot extends TimedRobot {
   private DifferentialDrive m_myRobot;
-  private Joystick m_leftStick;
-  private Joystick m_rightStick;
-  private PWMSparkMax m_leftMotor;
-  private PWMSparkMax m_rightMotor;
+  private Joystick m_stick;
+  private SparkMax m_leftMotor;
+  private SparkMax m_rightMotor;
+  
+  // ===============================================
+  // CONFIGURATION DU TYPE DE MOTEUR ICI
+  // ===============================================
+  private static final MotorType MOTOR_TYPE = MotorType.kBrushless;  // Changez ici!
+  // Options: MotorType.kBrushless ou MotorType.kBrushed
+  
+  // Paramètres selon le type de moteur
+  private static final int CURRENT_LIMIT = (MOTOR_TYPE == MotorType.kBrushless) ? 40 : 35;
+  
+  private static final double NORMAL_SPEED = 0.8;
+  private static final double SLOW_SPEED = 0.4;
+  private static final double TURBO_SPEED = 1.0;
+  private static final double ROTATION_SPEED = 0.7;
+  private static final double DEADBAND = 0.08;
 
   @Override
   public void robotInit() {
-    m_leftMotor = new PWMSparkMax(1);
-    m_rightMotor = new PWMSparkMax(4);
+    // Initialisation des moteurs avec le type configuré
+    m_leftMotor = new SparkMax(1, MOTOR_TYPE);
+    m_rightMotor = new SparkMax(4, MOTOR_TYPE);
     
-    m_rightMotor.setInverted(true);
+    // Configuration moteur gauche
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.smartCurrentLimit(CURRENT_LIMIT);
+    config.idleMode(IdleMode.kBrake);
+    config.inverted(false);
+    config.voltageCompensation(12.0);
+    config.openLoopRampRate(0.3);
+    
+    m_leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
+    // Configuration moteur droit (inversé)
+    SparkMaxConfig configRight = new SparkMaxConfig();
+    configRight.smartCurrentLimit(CURRENT_LIMIT);
+    configRight.idleMode(IdleMode.kBrake);
+    configRight.inverted(true);
+    configRight.voltageCompensation(12.0);
+    configRight.openLoopRampRate(0.3);
+    
+    m_rightMotor.configure(configRight, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    // Configuration du DifferentialDrive
     m_myRobot = new DifferentialDrive(m_leftMotor, m_rightMotor);
-    m_myRobot.setDeadband(0.05);
+    m_myRobot.setDeadband(DEADBAND);
+    m_myRobot.setMaxOutput(NORMAL_SPEED);
     
-    m_leftStick = new Joystick(0);
-    m_rightStick = new Joystick(0);
+    m_stick = new Joystick(0);
+    
+    // Affichage du type de moteur sur SmartDashboard
+    String motorTypeName = (MOTOR_TYPE == MotorType.kBrushless) ? "Brushless" : "Brushed";
+    SmartDashboard.putString("Motor Type", motorTypeName);
+    SmartDashboard.putNumber("Current Limit", CURRENT_LIMIT);
   }
 
   @Override
   public void teleopPeriodic() {
-    m_myRobot.tankDrive(-m_leftStick.getY(), -m_rightStick.getY());
+    double speed = -m_stick.getY();
+    double rotation = -m_stick.getX();
+    
+    // Modes de vitesse
+    if (m_stick.getRawButton(1)) {
+      m_myRobot.setMaxOutput(TURBO_SPEED);
+      SmartDashboard.putString("Speed Mode", "TURBO");
+    } else if (m_stick.getRawButton(2)) {
+      m_myRobot.setMaxOutput(SLOW_SPEED);
+      SmartDashboard.putString("Speed Mode", "SLOW");
+    } else {
+      m_myRobot.setMaxOutput(NORMAL_SPEED);
+      SmartDashboard.putString("Speed Mode", "NORMAL");
+    }
+    
+    m_myRobot.arcadeDrive(speed, rotation);
+    
+    // Télémétrie
+    SmartDashboard.putNumber("Left Motor Current", m_leftMotor.getOutputCurrent());
+    SmartDashboard.putNumber("Right Motor Current", m_rightMotor.getOutputCurrent());
+  }
+
+  @Override
+  public void disabledInit() {
+    m_myRobot.stopMotor();
   }
 }
