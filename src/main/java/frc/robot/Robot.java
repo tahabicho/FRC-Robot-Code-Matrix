@@ -226,7 +226,7 @@ double zRotRaw = rawStick.getTwist(); // Triggers pour outake
 
 // ----- Commandes normales avec les axes (triggers) -----
 double intakeCmd = 0.0;
-if (zRaw > AXIS_THRESHOLD) intakeCmd = +INTAKE_MAX_SPEED;
+if (zRaw > AXIS_THRESHOLD) intakeCmd = +INTAKE_MAX_SPEED/2;
 else if (zRaw < -AXIS_THRESHOLD) intakeCmd = -INTAKE_MAX_SPEED;
 
 double outakeCmd = 0.0;
