@@ -11,6 +11,7 @@ public class Robot extends TimedRobot {
     private RobotContainer robotContainer;
     private final Timer autoTimer = new Timer();
 
+    
     @Override
     public void robotInit() {
         DataLogManager.start();

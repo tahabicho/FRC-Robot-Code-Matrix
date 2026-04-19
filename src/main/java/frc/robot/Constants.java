@@ -7,9 +7,9 @@ public final class Constants {
     private Constants() {}
 
     public static final class DriveConstants {
-        public static final int LEFT_LEADER_ID = 2;
-        public static final int LEFT_FOLLOWER_ID = 6;
-        public static final int RIGHT_LEADER_ID = 1;
+        public static final int LEFT_LEADER_ID = 1;
+        public static final int LEFT_FOLLOWER_ID = 2;
+        public static final int RIGHT_LEADER_ID = 3;
         public static final int RIGHT_FOLLOWER_ID = 4;
 
         public static final MotorType MOTOR_TYPE = MotorType.kBrushed;
@@ -25,8 +25,8 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final int INTAKE_ID = 3;
-        public static final int OUTAKE_ID = 5;
+        public static final int INTAKE_ID = 5;
+        public static final int OUTAKE_ID = 6;
 
         public static final MotorType MOTOR_TYPE = MotorType.kBrushed;
         public static final int CURRENT_LIMIT = 35;
@@ -49,5 +49,20 @@ public final class Constants {
     public static final class OIConstants {
         public static final int CONTROLLER_PORT = 0;
         public static final int JOYSTICK_PORT = 1;
+    }
+
+    public static final class VisionConstants {
+        public static final String CAMERA_NAME = "FrontCam";
+        
+        // Position de la caméra par rapport au centre du robot
+        // A MESURER EN VRAI sur votre robot
+        public static final double CAMERA_FORWARD_METERS = 0.20; // caméra 20 cm devant le centre
+        public static final double CAMERA_SIDE_METERS = 0.0;     // centrée gauche/droite
+        public static final double CAMERA_HEIGHT_METERS = 0.35;  // caméra à 35 cm du sol
+
+    // Rotation de la caméra
+        public static final double CAMERA_ROLL_RADIANS = 0.0;
+        public static final double CAMERA_PITCH_RADIANS = Math.toRadians(0.0); // inclinaison haut/bas
+        public static final double CAMERA_YAW_RADIANS = 0.0;
     }
 }

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
 
@@ -18,6 +19,7 @@ public class RobotContainer {
             new XboxController(Constants.OIConstants.CONTROLLER_PORT);
     private final Joystick rawStick =
             new Joystick(Constants.OIConstants.JOYSTICK_PORT);
+    private final VisionSubsystem visionSubsystem = new VisionSubsystem();
 
     private ADXRS450_Gyro gyro;
     private boolean prevA = false;
@@ -34,6 +36,7 @@ public class RobotContainer {
         driveSubsystem.stop();
         intakeSubsystem.stopAll();
         intakeSubsystem.resetStates();
+        
 
         prevA = false;
         rotationAlerted = false;
@@ -48,6 +51,8 @@ public class RobotContainer {
         handleIntakeOutake();
         updateGyro();
         updateDashboard();
+        visionSubsystem.updateDashboard();
+
     }
 
     public void autonomousInit() {
@@ -187,6 +192,12 @@ public class RobotContainer {
         SmartDashboard.putBoolean("Intake Overheat", false);
         SmartDashboard.putBoolean("Outake Overheat", false);
         SmartDashboard.putNumber("Battery Voltage (V)", RobotController.getBatteryVoltage());
+        SmartDashboard.putBoolean("Vision/Has Targets", false);
+        SmartDashboard.putNumber("Vision/Best Target ID", -1);
+        SmartDashboard.putBoolean("Vision/Pose Present", false);
+        SmartDashboard.putNumber("Vision/Robot Pose X", 0.0);
+        SmartDashboard.putNumber("Vision/Robot Pose Y", 0.0);
+        SmartDashboard.putNumber("Vision/Robot Rotation Deg", 0.0);
     }
 
     private void updateDashboard() {
